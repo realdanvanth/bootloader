@@ -3,6 +3,7 @@ org 0x7c00
 call input
 ;call printsi
 call prime
+call loading
 jmp $
 prime:
   mov di, 0 
