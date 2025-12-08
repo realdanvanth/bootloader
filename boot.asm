@@ -1,10 +1,19 @@
 bits 16
 org 0x7c00
-call input
-call prime
-call print
-call loading
+diskNum:
+ db 0
+mov [diskNum], dl
+call read_disk
+mov ah, 0x0e
+mov al, [0x7e00]
+int 0x10
 jmp $
+start:
+  call input
+  call prime
+  call print
+  call loading
+  jmp $
 prime:
   mov di, 0 
   mov cx, 1
@@ -29,6 +38,7 @@ prime:
   ret
   .notprime:
   mov si, isnotprime
+  jmp start
   ret 
 printsi:
   mov di, 0
@@ -136,9 +146,25 @@ isprime:
   db "Access Granted ", 0
 isnotprime:
   db "Access Denied Restart", 0
+read_disk:
+  pusha
+  mov ah, 2
+  mov al, 1 ; no of secs to read
+  mov ch, 0 ;cylinder number 0x7ee
+  mov cl, 2 ; sector no
+  mov dh, 0 ; headnumber
+  mov dl, [diskNum] ;drive numver
+  xor ax, ax
+  mov es, ax
+  mov bx, 0x7e00
+  int 0x13
+  popa
+  jc halt
+  ret
 load:
   db "-\|/", 0
 times 510-($-$$) db 0
 dw 0xAA55
+times 512 db 'A'
 
 
