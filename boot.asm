@@ -1,8 +1,8 @@
 bits 16
 org 0x7c00
 call input
-;call printsi
 call prime
+call print
 call loading
 jmp $
 prime:
@@ -21,12 +21,14 @@ prime:
   .out:
   cmp di, 0
   jg .notprime
-  mov si, 1
-  call printsi
+  mov si, isprime
+  mov dh, 11
+  mov dl, 32
+  call movcursor
+  call clearscreen
   ret
   .notprime:
-  mov si, 0
-  call printsi
+  mov si, isnotprime
   ret 
 printsi:
   mov di, 0
@@ -106,7 +108,13 @@ movcursor:
   mov bh, 0
   int 0x10
   ret
-
+print:
+  mov ah, 0x0e
+  lodsb
+  int 0x10
+  cmp al, 0
+  jne print
+  ret
 delay: 
   mov ah,0x86
   mov cx,0x0002    
@@ -124,7 +132,10 @@ halt:
   int 0x10
   hlt
   jmp halt
-
+isprime:
+  db "Access Granted ", 0
+isnotprime:
+  db "Access Denied Restart", 0
 load:
   db "-\|/", 0
 times 510-($-$$) db 0
