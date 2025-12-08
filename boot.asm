@@ -1,8 +1,32 @@
 bits 16
 org 0x7c00
 call input
-call printsi
-jmp loading
+;call printsi
+call prime
+jmp $
+prime:
+  mov di, 0 
+  mov cx, 1
+  .loop: 
+    inc cx
+    mov bx, cx
+    call divide
+    cmp cx, si
+    jge .out 
+    cmp dx, 0
+    jne .loop
+    inc di
+    jmp .loop
+  .out:
+  cmp di, 0
+  jg .notprime
+  mov si, 1
+  call printsi
+  ret
+  .notprime:
+  mov si, 0
+  call printsi
+  ret 
 printsi:
   mov di, 0
   .loop1:
@@ -88,7 +112,11 @@ delay:
   mov dx,0x86A0    
   int 0x15
   ret
-
+divide:
+  mov ax, si
+  mov dx, 0 
+  div bx 
+  ret
 halt:
   mov ah, 0x0e
   mov al, '@'
